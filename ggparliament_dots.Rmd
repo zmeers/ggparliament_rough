@@ -1,0 +1,88 @@
+---
+title: "ggparliament_dots"
+author: "Zoe Meers"
+date: "16/05/2018"
+output: html_document
+---
+
+
+```{r}
+ggparliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, type=c("u-shape", "hemicircle")) {
+  if (type == "u-shape") {
+    seats <- function(N, M, r0=5.5) {
+      radii <- seq(r0, 7, len = M)
+
+      counts <- numeric(M)
+      pts <- do.call(
+        rbind,
+        lapply(1:M, function(i) {
+          counts[i] <<- round(N * radii[i] / sum(radii[i:M]))
+          theta <- seq(0, pi, len = counts[i])
+          N <<- N - counts[i]
+          data.frame(
+            x = radii[i] * cos(theta), y = radii[i] * sin(theta), r = i,
+            theta = theta
+          )
+        })
+      )
+      pts <- pts[order(-pts$theta, -pts$r), ]
+      pts
+    }
+
+
+    election <- function(seats, counts) {
+      stopifnot(sum(counts) == nrow(seats))
+      seats$party <- rep(1:length(counts), counts)
+      seats
+    }
+    layout <- seats(totalseats, parlrows)
+    result <- election(layout, seatspp)
+
+    ggplot() + geom_point(data = result, aes(x, y, colour = as.character(party)))
+  }
+  else{
+    seats <- function(N, M, r0=3) {
+      radii <- seq(r0, 1, len = M)
+
+      counts <- numeric(M)
+      pts <- do.call(
+        rbind,
+        lapply(1:M, function(i) {
+          counts[i] <<- round(N * radii[i] / sum(radii[i:M]))
+          theta <- seq(0, pi, len = counts[i])
+          N <<- N - counts[i]
+          data.frame(
+            x = radii[i] * cos(theta), y = radii[i] * sin(theta), r = i,
+            theta = theta
+          )
+        })
+      )
+      pts <- pts[order(-pts$theta, -pts$r), ]
+      pts
+    }
+
+
+    election <- function(seats, counts) {
+      stopifnot(sum(counts) == nrow(seats))
+      seats$party <- rep(1:length(counts), counts)
+      seats
+    }
+    layout <- seats(totalseats, parlrows)
+    result <- election(layout, seatspp)
+    
+
+    ggplot() + geom_point(data = result, aes(x, y, colour = as.character(party)))
+  }
+}
+
+
+
+aust <- ggparliament_dots(type='u-shape', totalseats=sum(AustralianElections$value), parlrows = 4, seatspp=AustralianElections$value) +  scale_colour_manual(values = c("red", "grey", "#009900", "blue"), labels=c("ALP", "Ind.", "Nats.","LNP"))  + theme_void() +  labs(colour="Party", title="U-shaped parliament: Australia") 
+aust
+
+VoteGermany2013 <- data.frame(Party=c( "CDU/CSU", "SPD", "LINKE","GRUENE"),
+                          Result=c(311,193,64,63))
+
+ggparliament_dots(type='hemicircle', totalseats=sum(VoteGermany2013$Result), parlrows=10, seatspp=VoteGermany2013$Result) + theme_void() + labs(colour="Party", title="Hemicircle parliament: Germany") + scale_colour_manual(values = c("red", "grey", "#009900", "blue"), labels=c("CDU/CSU", "SPD", "LINKE","GRUENE")) 
+```
+

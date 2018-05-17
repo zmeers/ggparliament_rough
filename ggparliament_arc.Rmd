@@ -1,0 +1,29 @@
+---
+title: "ggparliament_arc"
+author: "Zoe Meers"
+date: "16/05/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+ggparliament_arc <- function(fill=fill, colour=colour, type=c('u-shape','hemicircle')) {
+ if(type=='u-shape'){
+        x <- ggplot() + geom_arc_bar(aes(x0 = 0, y0 = 0, r0 = .6, r = 1, start = ymin, end = ymax, fill = fill, explode = .02), colour = colour)
+  return(x)
+    } else{
+        x <- ggplot() + geom_arc_bar(aes(x0 = 0, y0 = 0, r0 = .5, r = 1, start = ymin, end = ymax, fill = fill, explode = .02), colour = colour)
+  return(x)
+    }
+  x + theme_void()
+}
+```
+
+```{r}
+ggparliament_arc(fill = AustralianElections$key, colour = "white")
+```
+

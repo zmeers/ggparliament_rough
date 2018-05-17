@@ -1,0 +1,104 @@
+---
+title: "ggparliament_waffle"
+author: "Zoe Meers"
+date: "16/05/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(waffle)
+library(tidyverse)
+library(ggparliament)
+```
+
+```{r}
+ukresults <- read_csv("UK2017.csv")
+ukresults <- ukresults %>%
+    filter(!is.na(win)) %>%
+    group_by(win) %>%
+    count(win) 
+ukresults$n <- as.numeric(ukresults$n)
+left_parties <- c("lab","snp","lib","grn","plc", "ind","oth")
+ukresults$location <-
+  ifelse(ukresults$win %in% left_parties, "left",
+         ifelse(ukresults$win==c("con"), "right",
+                ifelse(ukresults$win==c("dup"), "crossbench",
+                        NA  )))
+```
+
+
+```{r}
+ukresults_left <- ukresults %>%
+  filter(location=="left")
+left <- waffle(ukresults_left) 
+right <- ukresults$location==c("right","crossbench")
+ukresults_right <- ukresults %>%
+  filter(location=="right")
+right <- waffle(ukresults_right) 
+ukresults_crossbench <- ukresults %>%
+  filter(location=="crossbench")
+crossbench <- waffle(ukresults_crossbench) 
+crossbench
+parliament <-iron(left,right) 
+```
+
+
+```{r}
+geom_parliament_waffle <- function(rows=10, cols=30, left=TRUE, crossbench=FALSE, right =TRUE, partyvar=NA, seatsvar=NA){
+  
+# Waffles
+# How many rows do you want the y axis?
+# 
+# I need to convert my data into a data.frame with a unique specified x
+# and y axis for each case
+# Note - it's actually important to specify y first for a
+# horizontally-accumulating waffle
+waffle_df <- expand.grid(y = 1:rows,
+                          x = seq_len(ceiling(sum(cols) / rows)))
+
+
+
+# Expand the counts into a full vector of region labels - i.e., de-aggregate
+vec <- rep(partyvar, seatsperparty)
+
+
+# Depending on the value of ndeep, there might be more spots on the x-y grid
+# than there are cases - so fill those with NA
+waffle_df$group <- c(vec, rep(NA, nrow(waffle_df) - length(vec)))
+# Plot it
+ggplot(waffle_df, aes(x = x, y = y, fill = group)) + 
+    geom_tile(color = "white")
+
+}
+```
+```{r}
+
+```
+
+```{r}
+
+
+
+# Waffles
+# How many rows do you want the y axis to have?
+ndeep <- 5
+seats <- seats
+# I need to convert my data into a data.frame with uniquely-specified x
+# and y coordinates for each case
+# Note - it's actually important to specify y first for a
+# horizontally-accumulating waffle
+# One y for each row; then divide the total number of cases by the number of
+# rows and round up to get the appropriate number of x increments
+tb4waffles <- expand.grid(y = 1:ndeep,
+                          x = seq_len(ceiling(sum(seats) / ndeep)))
+
+# Expand the counts into a full vector of region labels - i.e., de-aggregate
+regionvec <- rep(tb$region, tb$ncases)
+
+# Depending on the value of ndeep, there might be more spots on the x-y grid
+# than there are cases - so fill those with NA
+tb4waffles$region <- c(regionvec, rep(NA, nrow(tb4waffles) - length(regionvec)))
+
+```
+
