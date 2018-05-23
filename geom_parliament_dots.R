@@ -63,7 +63,7 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
         classroom$party <- c(vec, rep(NA, nrow(classroom) - length(vec)))
         
         # Plot it
-        a <- geom_point(data=classroom, aes(x = x, y = y), color = classroom$party) 
+        geom_point(data=classroom, aes(x = x, y = y), color = classroom$party) 
     }
     else if(type=="opposing_benches"){
         westminster <- expand.grid(
