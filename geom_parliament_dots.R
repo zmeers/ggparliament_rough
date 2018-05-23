@@ -3,7 +3,20 @@
 ## 
 ## 
 
-
+#' A ggplot2 geom for parliament plots
+#' @param type type of parliament (horseshow, semicircle, circle, classroom, opposing benches)
+#' @param totalseats the total number of seats in parliament 
+#' @param parlrows number of rows in the parliament
+#' @param seatspp seats per party
+#' @param party_names names of political parties in parliament
+#'
+#'@example 
+#'df <- data.frame(Party = c("GUE/NGL", "S&D", "Greens/EFA", "ALDE", "EPP", "ECR", "EFD", "NA"),Number = c(35, 184, 55, 84, 265, 54, 32, 27))
+#'df1 <- parliament_data(df)
+#'ggplot() + geom_parliament_dots(type="semicircle, seatspp=df1$Number, parlrows=6, totalseats=sum(df1$Number))
+#'
+#' @author
+#' Zoe Meers
 geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
     if (type == "horseshoe") {
         seats <- function(N, M, r0=5.5) {
