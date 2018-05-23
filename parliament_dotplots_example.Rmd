@@ -1,0 +1,121 @@
+---
+title: "Parliament Dot Plots"
+author: "Zoe Meers"
+date: "22/05/2018"
+output:
+  html_document:
+      toc: true
+      toc_depth: 4
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+source("geom_parliament_dots.R")
+library(ggparliament)
+library(tidyverse)
+library(patchwork)
+```
+
+# Unique parliament layouts:
+
+## Opposing benches parliament
+
+### United Kingdom, Canada
+
+#### Data
+```{r}
+ukresults <- read.csv("UK2017.csv")
+ukresults <- ukresults %>%
+    filter(!is.na(win)) %>%
+    group_by(win) %>%
+    count(win) 
+ukresults$n <- as.numeric(ukresults$n)
+left_parties <- c("lab","snp","lib","grn","plc", "ind","oth")
+ukresults$location <-
+  ifelse(ukresults$win %in% left_parties, "left",
+         ifelse(ukresults$win==c("con", "dup"), "right",
+                        NA  ))
+ukresults_left <- ukresults %>%
+  filter(location=="left")
+ukresults_right <- ukresults %>%
+  filter(location=="right")
+
+```
+
+#### Plot 
+```{r}
+leftside <- ggplot() + geom_parliament_dots(type="opposing_benches", seatspp = ukresults_left$n, party_name = ukresults_left$win, parlrows=10) + theme_parliament() + coord_flip()
+
+rightside <- ggplot() + geom_parliament_dots(type="opposing_benches", seatspp = ukresults_right$n, party_name = ukresults_right$win, parlrows=10)+ theme_parliament() + coord_flip()
+
+combine_opposingbenches(left = leftside, right = rightside)
+```
+
+
+## Semicircle parliament
+### EU, France, United States, and so on...
+
+#### Data
+```{r}
+americandata <- data(US_congress)
+americandata <- US_congress
+US_congress1 <- americandata %>%
+  filter(start_year=="2017" & chamber=="lower")
+US_senate <- americandata %>%
+  filter(start_year=="2017" & chamber=="upper")
+```
+
+#### Plot
+```{r}
+congress <- ggplot() + geom_parliament_dots(type='semicircle', totalseats=sum(US_congress1$seats), parlrows=10, seatspp=US_congress1$seats) + theme_parliament() + labs(colour="Party", title="United States Congress") + scale_colour_manual(values=c("blue", "red"), labels=c("D", "R"))
+
+senate <- ggplot() + geom_parliament_dots(type='semicircle', totalseats=sum(US_senate$seats), parlrows=3, seatspp=US_senate$seats) + theme_parliament() + labs(colour="Party", title="United States Senate") + scale_colour_manual(values=c("blue", "red", "gray"), labels=c("D", "R", "I"))
+senate
+congress
+```
+
+
+## Horseshoe parliament
+### Australia, New Zealand
+
+
+#### Data
+```{r}
+# load data
+AustralianElections <- pscl::AustralianElections
+# filter to 2016, slice percent, total seats
+AustralianElections <- AustralianElections %>%
+  filter(date == "2016-07-02") %>%
+  gather() %>%
+  slice(-c(1:3, 8:19))
+
+# reorder rows into parliament layout (i.e. independents in the middle of the circle btwn the two major parties)
+AustralianElections <- AustralianElections[c(1, 4, 3, 2), ]
+AustralianElections$key <- factor(AustralianElections$key)
+# clean labels
+AustralianElections$key <- gsub("Seats", "", AustralianElections$key)
+au <- AustralianElections
+new_au_data <- parliament_data(data=au, seats=au$value, type='horseshoe')
+```
+
+
+#### Plot
+```{r}
+ggplot() + geom_parliament_dots(type='horseshoe', totalseats=sum(new_au_data$value), parlrows = 4, seatspp=new_au_data$value) + theme_parliament() +  labs(colour="Party", title="Horseshoe parliament: Australia") + scale_colour_manual(values=c("red","grey","#009900", "blue"), labels=c("ALP","Ind.","NP", "LP"))
+```
+
+## Circle parliament
+
+### old German Bundestag (find more modern examples).
+
+```{r}
+ggplot() + geom_parliament_dots(type="circle", seatspp = ukresults_right$n, party_name = ukresults_right$n, parlrows=6) + theme_parliament() + coord_polar() + scale_y_discrete(expand=c(1, 0))
+```
+
+## Classroom parliament
+
+### China, Russia, North Korea
+
+```{r}
+ggplot() + geom_parliament_dots(type="classroom", seatspp = ukresults_right$n, party_name = ukresults_right$n, parlrows=6) + theme_parliament() 
+```

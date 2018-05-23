@@ -9,8 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(waffle)
 library(tidyverse)
+library(extrafont)
 library(ggparliament)
 ```
+
 
 ```{r}
 ukresults <- read_csv("UK2017.csv")
@@ -27,78 +29,59 @@ ukresults$location <-
                         NA  )))
 ```
 
-
 ```{r}
 ukresults_left <- ukresults %>%
   filter(location=="left")
-left <- waffle(ukresults_left) 
-right <- ukresults$location==c("right","crossbench")
+left <- waffle(ukresults_left$n, rows=10, keep=FALSE) + scale_color_brewer(palette="Accent")
+#left
 ukresults_right <- ukresults %>%
   filter(location=="right")
-right <- waffle(ukresults_right) 
-ukresults_crossbench <- ukresults %>%
-  filter(location=="crossbench")
-crossbench <- waffle(ukresults_crossbench) 
-crossbench
-parliament <-iron(left,right) 
+right <- waffle(ukresults_right$n, rows=10, keep=FALSE, color=c("light blue", "white")) +  scale_color_brewer(palette="Accent")
+iron(left,right)
+a <- waffle(ukresults$n, rows=10, keep=FALSE, color=c("red", "green", "purple", "yellow","blue","brown","dark blue","sky blue", "orange","gray", "pink"))
+
+
+a + facet_grid(location~.)
+
+
 ```
 
-
 ```{r}
-geom_parliament_waffle <- function(rows=10, cols=30, left=TRUE, crossbench=FALSE, right =TRUE, partyvar=NA, seatsvar=NA){
-  
-# Waffles
-# How many rows do you want the y axis?
-# 
-# I need to convert my data into a data.frame with a unique specified x
-# and y axis for each case
-# Note - it's actually important to specify y first for a
-# horizontally-accumulating waffle
-waffle_df <- expand.grid(y = 1:rows,
-                          x = seq_len(ceiling(sum(cols) / rows)))
+ggplot_westminster <- function(dat = NA, rows = NULL, seatspp = NA, partyvar = NA) {
+  westminster <- expand.grid(
+    y = 1:rows,
+    x = seq_len(ceiling(sum(seatspp) / rows)),
+    z = partyvar
+  )
 
+  vec <- rep(partyvar, seatspp)
+  westminster$party <- c(vec, rep(NA, nrow(westminster) - length(vec)))
 
-
-# Expand the counts into a full vector of region labels - i.e., de-aggregate
-vec <- rep(partyvar, seatsperparty)
-
-
-# Depending on the value of ndeep, there might be more spots on the x-y grid
-# than there are cases - so fill those with NA
-waffle_df$group <- c(vec, rep(NA, nrow(waffle_df) - length(vec)))
-# Plot it
-ggplot(waffle_df, aes(x = x, y = y, fill = group)) + 
-    geom_tile(color = "white")
-
+  # Plot it
+  ggplot(westminster, aes(x = x, y = y)) + geom_point(color = westminster$party) + coord_flip() + theme_void()
 }
+
+a <- ggplot_westminster(dat = ukresults_left, seatspp = ukresults_left$n, partyvar = ukresults_left$n, rows = 10)
+
+b <- ggplot_westminster(dat = ukresults_right, seatspp = ukresults_right$n, partyvar = ukresults_right$n, rows = 10)
+
+combine_westminster <- function(left=NA, right=NA) {
+  left + plot_spacer() + right
+}
+
+
+combine_westminster(left = a, right = b)
 ```
-```{r}
+```{r, fig.width=3}
+ggplot(data=na.omit(ukresults), aes(x=location, y=n, group=win, fill=win)) + geom_bar(stat="identity") +  scale_x_discrete(limits=c("left", "crossbench","right")) + ussc::scale_fill_ussc(discrete=TRUE, reverse=TRUE)+ coord_flip() + theme_void()
 
+ggplot(data=na.omit(ukresults), aes(x=location,  group=win, fill=win)) + geom_dotplot(stackgroups = TRUE, binpositions = "all", method="histodot") +  scale_x_discrete(limits=c("left", "crossbench","right")) + ussc::scale_fill_ussc(discrete=TRUE, reverse=TRUE)+ coord_flip() + theme_void()
 ```
 
+
+
+
 ```{r}
-
-
-
-# Waffles
-# How many rows do you want the y axis to have?
-ndeep <- 5
-seats <- seats
-# I need to convert my data into a data.frame with uniquely-specified x
-# and y coordinates for each case
-# Note - it's actually important to specify y first for a
-# horizontally-accumulating waffle
-# One y for each row; then divide the total number of cases by the number of
-# rows and round up to get the appropriate number of x increments
-tb4waffles <- expand.grid(y = 1:ndeep,
-                          x = seq_len(ceiling(sum(seats) / ndeep)))
-
-# Expand the counts into a full vector of region labels - i.e., de-aggregate
-regionvec <- rep(tb$region, tb$ncases)
-
-# Depending on the value of ndeep, there might be more spots on the x-y grid
-# than there are cases - so fill those with NA
-tb4waffles$region <- c(regionvec, rep(NA, nrow(tb4waffles) - length(regionvec)))
 
 ```
 

@@ -1,0 +1,20 @@
+scale_colour_party <- function(country = NA, ...) {
+    if (country=="USA"){
+
+    ]
+    else if(country== "AUS"){
+
+    }
+    else if(country== "GER"){
+
+    }
+    else if(country== "UK"){
+
+    }
+    else if(country== "FRA"){
+
+    }
+    else if(country== "FRA"){
+
+    }
+}
