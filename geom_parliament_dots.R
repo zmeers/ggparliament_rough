@@ -48,7 +48,7 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
     layout <- seats(totalseats, parlrows)
     result <- election(layout, seatspp)
 
-    geom_point(data = result, aes(x, y, colour = as.character(party)))
+    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
   }
   else if (type == "circle") {
     circle <- expand.grid(
@@ -75,7 +75,7 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
     classroom$party <- c(vec, rep(NA, nrow(classroom) - length(vec)))
 
     # Plot it
-    geom_point(data = classroom, aes(x = x, y = y), colour = classroom$party)
+    geom_point(data = classroom, aes(x = x, y = y), colour = classroom$party, size=3)
   }
   else if (type == "opposing_benches") {
     westminster <- expand.grid(
@@ -88,7 +88,7 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
     westminster$party <- c(vec, rep(NA, nrow(westminster) - length(vec)))
 
     # Plot it
-    geom_point(data = westminster, aes(x = x, y = y), colour = westminster$party)
+    geom_point(data = westminster, aes(x = x, y = y), colour = westminster$party, size=3)
   }
   else {
     seats <- function(N, M, r0=1) {
@@ -121,7 +121,7 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
     result <- election(layout, seatspp)
 
 
-    geom_point(data = result, aes(x, y, colour = as.character(party)))
+    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
   }
 }
 
