@@ -39,9 +39,9 @@ party_colours <- function(...) {
 #' Zoe Meers
 #'
 party_pal <- list(
-    `GER` = party_colours("red", "grey", "green", "dark blue"),
-    `AUS` = party_colours("red", "grey", "green", "dark blue"),
-    `USA` = party_colours("red",  "dark blue", "dark grey"),
+    `GER` = party_colours("red", "dark grey", "green", "dark blue"),
+    `AUS` = party_colours("red", "dark grey", "green", "dark blue"),
+    `USA` = party_colours("dark blue", "red",  "dark grey"),
     `FRA` = party_colours("red", "maroon", "yellow", "orange", "light blue", "dark blue", "dark grey"),
     `UK` = party_colours("light blue", "purple","dark grey", "purple","green","light grey","yellow","red")
 )
