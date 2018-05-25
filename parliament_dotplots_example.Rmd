@@ -15,7 +15,7 @@ source("scale_colours_parties.R")
 load("election_data.rda")
 library(ggparliament)
 library(tidyverse)
-library(patchwork)
+#library(patchwork)
 ```
 
 # Unique parliament layouts:

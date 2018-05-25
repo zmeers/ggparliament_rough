@@ -51,44 +51,44 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, s
     geom_point(data = result, aes(x, y, colour=as.factor(party)), size=size)
   }
   else if (type == "circle") {
-    circle <- expand.grid(
+    result <- expand.grid(
       y = 1:parlrows,
       x = seq_len(ceiling(sum(seatspp) / parlrows)),
       z = party_names
     )
 
     vec <- rep(party_names, seatspp)
-    circle$party <- c(vec, rep(NA, nrow(circle) - length(vec)))
+    result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
 
     # Plot it
-    geom_point(data = circle, aes(x = x, y = y, colour = as.factor(party)), size=size)
+    geom_point(data = result, aes(x = x, y = y, colour = as.factor(party)), size=size)
     # + coord_polar() + scale_y_discrete(expand=c(0.7, 0))
   }
   else if (type == "classroom") {
-    classroom <- expand.grid(
+    result <- expand.grid(
       y = 1:parlrows,
       x = seq_len(ceiling(sum(seatspp) / parlrows)),
       z = party_names
     )
 
     vec <- rep(party_names, seatspp)
-    classroom$party <- c(vec, rep(NA, nrow(classroom) - length(vec)))
+    result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
 
     # Plot it
-    geom_point(data = classroom, aes(x = x, y = y, colour = as.factor(party)), size=size)
+    geom_point(data = result, aes(x = x, y = y, colour = as.factor(party)), size=size)
   }
   else if (type == "opposing_benches") {
-    westminster <- expand.grid(
+    result <- expand.grid(
       y = 1:parlrows,
       x = seq_len(ceiling(sum(seatspp) / parlrows)),
       z = party_names
     )
 
     vec <- rep(party_names, seatspp)
-    westminster$party <- c(vec, rep(NA, nrow(westminster) - length(vec)))
+    result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
 
     # Plot it
-    geom_point(data = westminster, aes(x = x, y = y, colour = as.factor(party)), size=size)
+    geom_point(data = result, aes(x = x, y = y, colour = as.factor(party)), size=size)
   }
   else {
     seats <- function(N, M) {
