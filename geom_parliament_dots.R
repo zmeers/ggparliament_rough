@@ -6,7 +6,7 @@
 #' A ggplot2 geom for parliament plots
 #' @param type type of parliament (horseshow, semicircle, circle, classroom, opposing benches)
 #' @param totalseats the total number of seats in parliament
-#' @param parlrows number of rows in the parliament
+#' @param parlrows number of rows in parliament
 #' @param seatspp seats per party
 #' @param party_names names of political parties in parliament
 #'
@@ -17,10 +17,10 @@
 #'
 #' @author
 #' Zoe Meers
-geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
+geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
   if (type == "horseshoe") {
-    seats <- function(N, M, r0=5.5) {
-      radii <- seq(r0, 7, len = M)
+    seats <- function(N, M) {
+      radii <- seq(5.5, 7, len = M)
 
       counts <- numeric(M)
       pts <- do.call(
@@ -48,7 +48,7 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
     layout <- seats(totalseats, parlrows)
     result <- election(layout, seatspp)
 
-    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
+    geom_point(data = result, aes(x, y, colour=as.factor(party)), size=size)
   }
   else if (type == "circle") {
     circle <- expand.grid(
@@ -61,7 +61,7 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
     circle$party <- c(vec, rep(NA, nrow(circle) - length(vec)))
 
     # Plot it
-    geom_point(data = circle, aes(x = x, y = y), colour = circle$party)
+    geom_point(data = circle, aes(x = x, y = y, colour = as.factor(party)), size=size)
     # + coord_polar() + scale_y_discrete(expand=c(0.7, 0))
   }
   else if (type == "classroom") {
@@ -75,7 +75,7 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
     classroom$party <- c(vec, rep(NA, nrow(classroom) - length(vec)))
 
     # Plot it
-    geom_point(data = classroom, aes(x = x, y = y), colour = classroom$party, size=3)
+    geom_point(data = classroom, aes(x = x, y = y, colour = as.factor(party)), size=size)
   }
   else if (type == "opposing_benches") {
     westminster <- expand.grid(
@@ -88,11 +88,11 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
     westminster$party <- c(vec, rep(NA, nrow(westminster) - length(vec)))
 
     # Plot it
-    geom_point(data = westminster, aes(x = x, y = y), colour = westminster$party, size=3)
+    geom_point(data = westminster, aes(x = x, y = y, colour = as.factor(party)), size=size)
   }
   else {
-    seats <- function(N, M, r0=1) {
-      radii <- seq(r0, 2, len = M)
+    seats <- function(N, M) {
+      radii <- seq(1, 3, len = M)
 
       counts <- numeric(M)
       pts <- do.call(
@@ -121,7 +121,7 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, p
     result <- election(layout, seatspp)
 
 
-    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
+    geom_point(data = result, aes(x, y, colour = as.factor(party)), size=size)
   }
 }
 
@@ -147,5 +147,5 @@ theme_parliament <- function() {
 #' @param right right hand side
 #' @author Zoe Meers
 combine_opposingbenches <- function(left=NA, right=NA) {
-  left + plot_spacer() + right
+  left + patchwork::plot_spacer() + right
 }
