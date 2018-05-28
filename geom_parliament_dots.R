@@ -17,11 +17,12 @@
 #'
 #' @author
 #' Zoe Meers
-geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
+geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, highlightgovernment=FALSE, government= NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
+ 
   if (type == "horseshoe") {
     seats <- function(N, M) {
       radii <- seq(5.5, 7, len = M)
-
+      
       counts <- numeric(M)
       pts <- do.call(
         rbind,
@@ -38,8 +39,8 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, s
       pts <- pts[order(-pts$theta, -pts$r), ]
       pts
     }
-
-
+    
+    
     election <- function(seats, counts) {
       stopifnot(sum(counts) == nrow(seats))
       seats$party <- rep(1:length(counts), counts)
@@ -47,53 +48,54 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, s
     }
     layout <- seats(totalseats, parlrows)
     result <- election(layout, seatspp)
-
-    geom_point(data = result, aes(x, y, colour=as.factor(party)), size=size)
+    
+    
+    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
   }
   else if (type == "circle") {
     result <- expand.grid(
-      y = 1:parlrows,
-      x = seq_len(ceiling(sum(seatspp) / parlrows)),
-      z = party_names
+      x = 1:parlrows,
+      y = seq_len(ceiling(sum(seatspp) / parlrows))
     )
-
+    
     vec <- rep(party_names, seatspp)
     result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
-
+    
     # Plot it
-    geom_point(data = result, aes(x = x, y = y, colour = as.factor(party)), size=size)
-    # + coord_polar() + scale_y_discrete(expand=c(0.7, 0))
+    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
   }
   else if (type == "classroom") {
     result <- expand.grid(
       y = 1:parlrows,
-      x = seq_len(ceiling(sum(seatspp) / parlrows)),
-      z = party_names
+      x = seq_len(ceiling(sum(seatspp) / parlrows))
     )
-
+    
     vec <- rep(party_names, seatspp)
     result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
-
+    
     # Plot it
-    geom_point(data = result, aes(x = x, y = y, colour = as.factor(party)), size=size)
+    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
+    
   }
   else if (type == "opposing_benches") {
     result <- expand.grid(
-      y = 1:parlrows,
-      x = seq_len(ceiling(sum(seatspp) / parlrows)),
-      z = party_names
+      x = 1:parlrows,
+      y = seq_len(ceiling(sum(seatspp) / parlrows))
     )
-
+    
     vec <- rep(party_names, seatspp)
     result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
-
+    
     # Plot it
-    geom_point(data = result, aes(x = x, y = y, colour = as.factor(party)), size=size)
+    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
+   
+  
   }
   else {
+    
     seats <- function(N, M) {
-      radii <- seq(1, 3, len = M)
-
+      radii <- seq(1, 2, len = M)
+      
       counts <- numeric(M)
       pts <- do.call(
         rbind,
@@ -110,8 +112,8 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, s
       pts <- pts[order(-pts$theta, -pts$r), ]
       pts
     }
-
-
+    
+    
     election <- function(seats, counts) {
       stopifnot(sum(counts) == nrow(seats))
       seats$party <- rep(1:length(counts), counts)
@@ -119,24 +121,20 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, s
     }
     layout <- seats(totalseats, parlrows)
     result <- election(layout, seatspp)
-
-
-    geom_point(data = result, aes(x, y, colour = as.factor(party)), size=size)
+    
+    
+    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
+    
   }
+  
+  
 }
 
 
-parliament_data <- function(data= NA, seats=NA, party_names = NA, type=c("semicircle", "horseshoe")) {
-  if (type == "horseshoe") {
-    data$Share <- seats / sum(seats)
-    data$ymax <- cumsum(data$Share)
-    data$ymin <- c(0, head(data$ymax, n = -1))
-    return(data)
-  }
-}
 
 
 #' A ggplot2 theme for parliament plots
+
 
 theme_parliament <- function() {
   theme_void()

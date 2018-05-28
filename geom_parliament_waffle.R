@@ -6,21 +6,22 @@
 #' A ggplot2 geom for parliament plots
 #' @param type type of parliament (horseshow, semicircle, circle, classroom, opposing benches)
 #' @param totalseats the total number of seats in parliament
-#' @param parlrows number of rows in the parliament
+#' @param parlrows number of rows in parliament
 #' @param seatspp seats per party
 #' @param party_names names of political parties in parliament
 #'
 #' @example
 #' df <- data.frame(Party = c("GUE/NGL", "S&D", "Greens/EFA", "ALDE", "EPP", "ECR", "EFD", "NA"),Number = c(35, 184, 55, 84, 265, 54, 32, 27))
 #' df1 <- parliament_data(df)
-#' ggplot() + geom_parliament_waffle(type="semicircle, seatspp=df1$Number, parlrows=6, totalseats=sum(df1$Number))
+#' ggplot() + geom_parliament_dots(type="semicircle, seatspp=df1$Number, parlrows=6, totalseats=sum(df1$Number))
 #'
 #' @author
 #' Zoe Meers
-geom_parliament_waffle <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
+geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, highlightgovernment=FALSE, government= NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
+    
     if (type == "horseshoe") {
-        seats <- function(N, M, r0=5.5) {
-            radii <- seq(r0, 7, len = M)
+        seats <- function(N, M) {
+            radii <- seq(5.5, 7, len = M)
             
             counts <- numeric(M)
             pts <- do.call(
@@ -48,51 +49,51 @@ geom_parliament_waffle <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL,
         layout <- seats(totalseats, parlrows)
         result <- election(layout, seatspp)
         
-        geom_point(data = result, aes(x, y, colour = as.character(party)), shape=15, size=4)
+        geom_tile(data = result, aes(x, y, colour = as.character(party)), fill=as.character(result$party))
     }
     else if (type == "circle") {
-        circle <- expand.grid(
-            y = 1:parlrows,
-            x = seq_len(ceiling(sum(seatspp) / parlrows)),
-            z = party_names
+        result <- expand.grid(
+            x = 1:parlrows,
+            y = seq_len(ceiling(sum(seatspp) / parlrows))
         )
         
         vec <- rep(party_names, seatspp)
-        circle$party <- c(vec, rep(NA, nrow(circle) - length(vec)))
+        result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
         
         # Plot it
-        geom_point(data = circle, aes(x = x, y = y), colour = circle$party, shape=15, size=3)
-        # + coord_polar() + scale_y_discrete(expand=c(0.7, 0))
+        geom_tile(data = result, aes(x, y, colour =as.character(party)), fill="white")
     }
     else if (type == "classroom") {
-        classroom <- expand.grid(
+        result <- expand.grid(
             y = 1:parlrows,
-            x = seq_len(ceiling(sum(seatspp) / parlrows)),
-            z = party_names
+            x = seq_len(ceiling(sum(seatspp) / parlrows))
         )
         
         vec <- rep(party_names, seatspp)
-        classroom$party <- c(vec, rep(NA, nrow(classroom) - length(vec)))
+        result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
         
         # Plot it
-        geom_point(data = classroom, aes(x = x, y = y), colour = classroom$party, shape=15, size=3)
+         geom_tile(data = result, aes(x, y, colour = as.character(party)), fill="white")
+        
     }
     else if (type == "opposing_benches") {
-        westminster <- expand.grid(
-            y = 1:parlrows,
-            x = seq_len(ceiling(sum(seatspp) / parlrows)),
-            z = party_names
+        result <- expand.grid(
+            x = 1:parlrows,
+            y = seq_len(ceiling(sum(seatspp) / parlrows))
         )
         
         vec <- rep(party_names, seatspp)
-        westminster$party <- c(vec, rep(NA, nrow(westminster) - length(vec)))
+        result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
         
         # Plot it
-        geom_point(data = westminster, aes(x = x, y = y), colour = westminster$party, shape=15, size=3)
+        geom_tile(data = result, aes(x, y, colour = as.character(party)), fill="white")
+        
+        
     }
     else {
-        seats <- function(N, M, r0=1) {
-            radii <- seq(r0, 2, len = M)
+        
+        seats <- function(N, M) {
+            radii <- seq(1, 2, len = M)
             
             counts <- numeric(M)
             pts <- do.call(
@@ -120,23 +121,18 @@ geom_parliament_waffle <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL,
         layout <- seats(totalseats, parlrows)
         result <- election(layout, seatspp)
         
+        geom_tile(data = result, aes(x, y, colour = as.character(party)), fill="white")
         
-        geom_point(data = result, aes(x, y, colour = as.character(party)), size=3, shape=15)
     }
+    
+    
 }
 
 
-parliament_data <- function(data= NA, seats=NA, party_names = NA, type=c("semicircle", "horseshoe")) {
-    if (type == "horseshoe") {
-        data$Share <- seats / sum(seats)
-        data$ymax <- cumsum(data$Share)
-        data$ymin <- c(0, head(data$ymax, n = -1))
-        return(data)
-    }
-}
 
 
 #' A ggplot2 theme for parliament plots
+
 
 theme_parliament <- function() {
     theme_void()
@@ -147,5 +143,5 @@ theme_parliament <- function() {
 #' @param right right hand side
 #' @author Zoe Meers
 combine_opposingbenches <- function(left=NA, right=NA) {
-    left + plot_spacer() + right
+    left + patchwork::plot_spacer() + right
 }
