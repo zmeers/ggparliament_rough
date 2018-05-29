@@ -17,53 +17,9 @@
 #'
 #' @author
 #' Zoe Meers
-geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, highlightgovernment=FALSE, government= NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
+geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, highlightgovernment=FALSE, government= NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("classroom", "opposing_benches")) {
     
-    if (type == "horseshoe") {
-        seats <- function(N, M) {
-            radii <- seq(5.5, 7, len = M)
-            
-            counts <- numeric(M)
-            pts <- do.call(
-                rbind,
-                lapply(1:M, function(i) {
-                    counts[i] <<- round(N * radii[i] / sum(radii[i:M]))
-                    theta <- seq(0, pi, len = counts[i])
-                    N <<- N - counts[i]
-                    data.frame(
-                        x = radii[i] * cos(theta), y = radii[i] * sin(theta), r = i,
-                        theta = theta
-                    )
-                })
-            )
-            pts <- pts[order(-pts$theta, -pts$r), ]
-            pts
-        }
-        
-        
-        election <- function(seats, counts) {
-            stopifnot(sum(counts) == nrow(seats))
-            seats$party <- rep(1:length(counts), counts)
-            seats
-        }
-        layout <- seats(totalseats, parlrows)
-        result <- election(layout, seatspp)
-        
-        geom_tile(data = result, aes(x, y, colour = as.character(party)), fill=as.character(result$party))
-    }
-    else if (type == "circle") {
-        result <- expand.grid(
-            x = 1:parlrows,
-            y = seq_len(ceiling(sum(seatspp) / parlrows))
-        )
-        
-        vec <- rep(party_names, seatspp)
-        result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
-        
-        # Plot it
-        geom_tile(data = result, aes(x, y, colour =as.character(party)), fill="white")
-    }
-    else if (type == "classroom") {
+   if (type == "classroom") {
         result <- expand.grid(
             y = 1:parlrows,
             x = seq_len(ceiling(sum(seatspp) / parlrows))
@@ -73,10 +29,10 @@ geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, highlightgover
         result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
         
         # Plot it
-         geom_tile(data = result, aes(x, y, colour = as.character(party)), fill="white")
+        geom_tile(data = result, aes(x, y, fill=as.character(party)),colour="white", size=0.8)
         
     }
-    else if (type == "opposing_benches") {
+    else {
         result <- expand.grid(
             x = 1:parlrows,
             y = seq_len(ceiling(sum(seatspp) / parlrows))
@@ -86,45 +42,10 @@ geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, highlightgover
         result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
         
         # Plot it
-        geom_tile(data = result, aes(x, y, colour = as.character(party)), fill="white")
+        geom_tile(data = result, aes(x, y, fill=as.character(party)),colour="white", size=0.8)
         
         
     }
-    else {
-        
-        seats <- function(N, M) {
-            radii <- seq(1, 2, len = M)
-            
-            counts <- numeric(M)
-            pts <- do.call(
-                rbind,
-                lapply(1:M, function(i) {
-                    counts[i] <<- round(N * radii[i] / sum(radii[i:M]))
-                    theta <- seq(0, pi, len = counts[i])
-                    N <<- N - counts[i]
-                    data.frame(
-                        x = radii[i] * cos(theta), y = radii[i] * sin(theta), r = i,
-                        theta = theta
-                    )
-                })
-            )
-            pts <- pts[order(-pts$theta, -pts$r), ]
-            pts
-        }
-        
-        
-        election <- function(seats, counts) {
-            stopifnot(sum(counts) == nrow(seats))
-            seats$party <- rep(1:length(counts), counts)
-            seats
-        }
-        layout <- seats(totalseats, parlrows)
-        result <- election(layout, seatspp)
-        
-        geom_tile(data = result, aes(x, y, colour = as.character(party)), fill="white")
-        
-    }
-    
     
 }
 

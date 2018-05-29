@@ -60,12 +60,12 @@ leftside <- ggplot() +
     type = "opposing_benches",
     seatspp = ukresults_left$seats,
     party_names = ukresults_left$party_long,
-    parlrows = 10,
+    parlrows = 10
   ) +
   theme_parliament() +
   theme(legend.position = "left") +
-  labs(colour = "", title = "Opposing benches parliament: Westminster") +
-  scale_colour_manual(
+  labs(fill = "", title = "Opposing benches parliament: Westminster") +
+  scale_fill_manual(
     values = c(ukresults_left$colour),
     labels = c(ukresults_left$party_long),
     limits = c(ukresults_left$party_long)
@@ -79,107 +79,19 @@ rightside <- ggplot() +
     parlrows = 10
   ) +
   theme_parliament() +
-  labs(colour = "") +
-  scale_colour_manual(
+  labs(fill = "") +
+  scale_fill_manual(
     values = c(ukresults_right$colour),
     labels = c(ukresults_right$party_long),
     limits = c(ukresults_right$party_long)
-  ) 
-
+  )
 
 uk_parliament <- combine_opposingbenches(left = leftside, right = rightside)
 uk_parliament
 ```
 
 
-## Semicircle parliament
-### EU, France, United States, and so on...
 
-#### Data
-```{r}
-us_congress <- election_data %>%
-  filter(country == "USA" & 
-           year == "2016" & 
-           house == "Representatives")
-us_senate <- election_data %>%
-  filter(country == "USA" & 
-           year == "2016" & 
-           house == "Senate")
-```
-
-#### Plot
-```{r}
-ggplot() +
-  geom_parliament_waffle(
-    type = "semicircle",
-    totalseats = sum(us_congress$seats),
-    parlrows = 10, 
-    party_names = us_congress$party_long,
-    seatspp = us_congress$seats
-  ) +
-  theme_parliament() +
-  labs(colour = "", title = "United States Congress") +
-  scale_colour_manual(
-    values = us_congress$colour,
-    labels = us_congress$party_long
-  )
-```
-
-```{r}
-ggplot() +
-  geom_parliament_waffle(
-    type = "semicircle",
-    totalseats = sum(us_senate$seats),
-    parlrows = 4, 
-    party_names = us_senate$party_long,
-    seatspp = us_senate$seats
-  ) +
-  theme_parliament() +
-  labs(colour = "", title = "United States Senate") +
-  scale_colour_manual(
-    values = us_senate$colour,
-    labels = us_senate$party_long
-  )
-```
-
-
-## Horseshoe parliament
-### Australia, New Zealand
-
-
-#### Data
-```{r}
-australia <- election_data %>%
-  filter(year == 2016 & 
-           country == "Australia" & 
-           house == "Representatives")
-australia <- australia[c(1, 5, 6, 7, 4, 3, 2), ]
-```
-
-
-#### Plot
-```{r}
-ggplot() +
-  geom_parliament_waffle(
-    type = "horseshoe",
-    totalseats = sum(australia$seats),
-    parlrows = 4, 
-    seatspp = australia$seats,
-    party_names = australia$party_long
-  ) +
-  theme_parliament() +
-  labs(colour = "", title = "Horseshoe parliament: Australia") +
-  scale_colour_manual(
-    values = australia$colour,
-    labels = australia$party_long
-  )
-```
-
-## Circle parliament
-
-### old German Bundestag (find more modern examples).
-
-If we can't find a good example, is it worth including?
 
 
 ## Classroom parliament
@@ -203,12 +115,12 @@ ggplot() +
     parlrows = 10
   ) +
   theme_parliament() +
-  scale_colour_manual(
+  scale_fill_manual(
     values = c(russia$colour),
     labels = c(russia$party_long),
     limits = c(russia$party_long)
   ) +
-  labs(colour = "", title = "Russian Parliament")
+  labs(fill = "", title = "Russian Parliament")
 ```
 
 

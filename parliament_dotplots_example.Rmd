@@ -1,5 +1,5 @@
 ---
-title: "Parliament Dot Plots"
+title: "ggparliament: Parliament Plots"
 author: "Zoe Meers"
 date: "22/05/2018"
 output:
@@ -12,7 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 source("geom_parliament_dots.R")
 load("election_data.rda")
-election_data$government[is.na(election_data$government)] <- 0
+#election_data$government[is.na(election_data$government)] <- 0
 library(tidyverse)
 library(patchwork)
 ```
@@ -60,7 +60,7 @@ leftside <- ggplot() +
     type = "opposing_benches",
     seatspp = ukresults_left$seats,
     party_names = ukresults_left$party_long,
-    parlrows = 10,
+    parlrows = 10
   ) +
   theme_parliament() +
   theme(legend.position = "left") +
@@ -131,14 +131,14 @@ ggplot() +
     type = "semicircle",
     totalseats = sum(us_senate$seats),
     parlrows = 4, 
-    party_names = us_senate$party_long,
+    party_names = us_senate$party_short,
     seatspp = us_senate$seats
   ) +
   theme_parliament() +
   labs(colour = "", title = "United States Senate") +
   scale_colour_manual(
     values = us_senate$colour,
-    labels = us_senate$party_long
+    labels = us_senate$party_short
   )
 ```
 
@@ -199,14 +199,14 @@ ggplot() +
   geom_parliament_dots(
     type = "classroom",
     seatspp = russia$seats,
-    party_names = russia$party_long,
+    party_names = russia$party_short,
     parlrows = 10
   ) +
   theme_parliament() +
   scale_colour_manual(
     values = c(russia$colour),
-    labels = c(russia$party_long),
-    limits = c(russia$party_long)
+    labels = c(russia$party_short),
+    limits = c(russia$party_short)
   ) +
   labs(colour = "", title = "Russian Parliament")
 ```

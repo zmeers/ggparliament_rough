@@ -17,7 +17,7 @@
 #'
 #' @author
 #' Zoe Meers
-geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, highlightgovernment=FALSE, government= NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
+geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("horseshoe", "semicircle", "circle", "classroom", "opposing_benches")) {
  
   if (type == "horseshoe") {
     seats <- function(N, M) {
@@ -49,8 +49,9 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, highlightgovern
     layout <- seats(totalseats, parlrows)
     result <- election(layout, seatspp)
     
-    
+   
     geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
+
   }
   else if (type == "circle") {
     result <- expand.grid(
@@ -134,7 +135,6 @@ geom_parliament_dots <- function(totalseats=NULL, parlrows=NULL, highlightgovern
 
 
 #' A ggplot2 theme for parliament plots
-
 
 theme_parliament <- function() {
   theme_void()
