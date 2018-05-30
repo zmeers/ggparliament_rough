@@ -31,7 +31,6 @@ ukresults <- election_data %>%
   filter(country == "UK" & 
            year == 2017)
 ukresults$seats <- as.numeric(ukresults$seats)
-ukresults$government[is.na(ukresults$government)] <- 0
 left_parties <- c("Labour", 
                   "Scottish National Party", 
                   "Liberal Democrats", 
@@ -46,22 +45,29 @@ ukresults$location <-
       NA
     )
   )
+
 ukresults_left <- ukresults %>%
   filter(location == "left")
 
+ukresults_left <- parliament_data(electiondata=ukresults_left,
+                                  type = "opposing_benches",
+                                  seatspp = ukresults_left$seats,
+                                  parlrows = 10)
+
 ukresults_right <- ukresults %>%
   filter(location == "right")
+ukresults_right <- parliament_data(electiondata = ukresults_right,
+  type = "opposing_benches",
+    seatspp = ukresults_right$seats,
+    party_names = ukresults_right$party_long,
+    parlrows = 10)
+
 ```
 
 #### Plot 
 ```{r}
 leftside <- ggplot() +
-  geom_parliament_dots(
-    type = "opposing_benches",
-    seatspp = ukresults_left$seats,
-    party_names = ukresults_left$party_long,
-    parlrows = 10
-  ) +
+  geom_point(size=3) +
   theme_parliament() +
   theme(legend.position = "left") +
   labs(colour = "", title = "Opposing benches parliament: Westminster") +
@@ -84,6 +90,7 @@ rightside <- ggplot() +
     values = c(ukresults_right$colour),
     labels = c(ukresults_right$party_long),
     limits = c(ukresults_right$party_long)
+    
   ) 
 
 
@@ -101,45 +108,45 @@ us_congress <- election_data %>%
   filter(country == "USA" & 
            year == "2016" & 
            house == "Representatives")
+us_congress <- parliament_data(
+  electiondata= us_congress,
+    type = "semicircle",
+    totalseats = sum(us_congress$seats),
+    parlrows = 10, 
+    party_names = us_congress$party_short,
+    seatspp = us_congress$seats
+  ) 
 us_senate <- election_data %>%
   filter(country == "USA" & 
            year == "2016" & 
            house == "Senate")
-```
-
-#### Plot
-```{r}
-ggplot() +
-  geom_parliament_dots(
-    type = "semicircle",
-    totalseats = sum(us_congress$seats),
-    parlrows = 10, 
-    party_names = us_congress$party_long,
-    seatspp = us_congress$seats
-  ) +
-  theme_parliament() +
-  labs(colour = "", title = "United States Congress") +
-  scale_colour_manual(
-    values = us_congress$colour,
-    labels = us_congress$party_long
-  )
-```
-
-```{r}
-ggplot() +
-  geom_parliament_dots(
+us_senate <- parliament_data(
+  electiondata= us_senate,
     type = "semicircle",
     totalseats = sum(us_senate$seats),
     parlrows = 4, 
     party_names = us_senate$party_short,
     seatspp = us_senate$seats
-  ) +
+  ) 
+```
+
+#### Plot
+```{r}
+ggplot(us_congress, aes(x,y, colour=party_long)) +
+  geom_point(size=3)+
+  theme_parliament() +
+  labs(colour = "", title = "United States Congress") +
+  scale_colour_manual(values=us_congress$colour, limits=us_congress$party_long)
+```
+
+
+```{r}
+ggplot(us_senate, aes(x,y, colour=party_long)) +
+  geom_point(size=3)+
+  geom_highlight_point(government>0)+
   theme_parliament() +
   labs(colour = "", title = "United States Senate") +
-  scale_colour_manual(
-    values = us_senate$colour,
-    labels = us_senate$party_short
-  )
+  scale_colour_manual(values=us_senate$colour, limits=us_senate$party_long)
 ```
 
 
@@ -154,25 +161,25 @@ australia <- election_data %>%
            country == "Australia" & 
            house == "Representatives")
 australia <- australia[c(1, 5, 6, 7, 4, 3, 2), ]
+
+aus <- parliament_data(electiondata=australia, 
+                       totalseats = sum(australia$seats), 
+                       seatspp = australia$seats, 
+                       parlrows = 4, 
+                       type = "horseshoe")
+
 ```
 
-
 #### Plot
+
 ```{r}
-ggplot() +
-  geom_parliament_dots(
-    type = "horseshoe",
-    totalseats = sum(australia$seats),
-    parlrows = 4, 
-    seatspp = australia$seats,
-    party_names = australia$party_long
-  ) +
+ggplot(aus, aes(x, y, colour=party_long)) +
+  geom_point(size=3) +
   theme_parliament() +
-  labs(colour = "", title = "Horseshoe parliament: Australia") +
-  scale_colour_manual(
-    values = australia$colour,
-    labels = australia$party_long
-  )
+  labs(colour = "", title = "Horseshoe parliament: Australia",
+       subtitle= "Government encircled in black.") +
+  scale_colour_manual(values=aus$colour, limits=aus$party_long) +
+  geom_highlight_point(government==1)
 ```
 
 ## Circle parliament
@@ -191,24 +198,25 @@ If we can't find a good example, is it worth including?
 russia <- election_data %>%
   filter(country == "Russia", 
          year == "2016")
+russia <- parliament_data(electiondata=russia,
+                          type = "classroom",
+                          seatspp = russia$seats,
+                          party_names = russia$party_short,
+                          parlrows = 10)
 ```
 
 #### Plot
 ```{r}
-ggplot() +
-  geom_parliament_dots(
-    type = "classroom",
-    seatspp = russia$seats,
-    party_names = russia$party_short,
-    parlrows = 10
-  ) +
+ggplot(russia, aes(x,y,colour=party_short)) +
+  geom_point(size=3) +
   theme_parliament() +
   scale_colour_manual(
     values = c(russia$colour),
     labels = c(russia$party_short),
     limits = c(russia$party_short)
   ) +
-  labs(colour = "", title = "Russian Parliament")
+  labs(colour = "", title = "Russian Parliament") +
+  geom_highlight_point(government==1)
 ```
 
 

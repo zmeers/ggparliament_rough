@@ -17,7 +17,8 @@
 #'
 #' @author
 #' Zoe Meers
-parliament_data <- function(totalseats=NULL, 
+parliament_data <- function(electiondata=NA,
+                            totalseats=NULL, 
                                  parlrows=NULL, 
                                  seatspp=NULL, 
                                  party_names=NULL, 
@@ -56,8 +57,9 @@ parliament_data <- function(totalseats=NULL,
     }
     layout <- seats(totalseats, parlrows)
     result <- election(layout, seatspp)
-    return(result)
-   
+    dat <- tidyr::uncount(electiondata, seatspp)
+    dat <- cbind(dat, result)
+    return(dat)
    # geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
 
   }
@@ -69,9 +71,11 @@ parliament_data <- function(totalseats=NULL,
     
     vec <- rep(party_names, seatspp)
     result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
-    
+    dat <- tidyr::uncount(electiondata, seatspp)
+    dat <- cbind(dat, result)
+    return(dat)
     # Plot it
-    geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
+    #geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
   }
   else if (type == "classroom") {
     result <- expand.grid(
@@ -81,7 +85,9 @@ parliament_data <- function(totalseats=NULL,
     
     vec <- rep(party_names, seatspp)
     result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
-    return(result)
+    dat <- tidyr::uncount(electiondata, seatspp)
+    dat <- cbind(dat, result)
+    return(dat)
     # Plot it
     #geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
     
@@ -94,7 +100,9 @@ parliament_data <- function(totalseats=NULL,
     
     vec <- rep(party_names, seatspp)
     result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
-    return(result)
+    dat <- tidyr::uncount(electiondata, seatspp)
+    dat <- cbind(dat, result)
+    return(dat)
     # Plot it
     #geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
    
@@ -130,7 +138,9 @@ parliament_data <- function(totalseats=NULL,
     }
     layout <- seats(totalseats, parlrows)
     result <- election(layout, seatspp)
-    return(result)
+    dat <- tidyr::uncount(electiondata, seatspp)
+    dat <- cbind(dat, result)
+    return(dat)
     
     #geom_point(data = result, aes(x, y, colour = as.character(party)), size=3)
     
@@ -157,7 +167,7 @@ combine_opposingbenches <- function(left=NA, right=NA) {
 }
 
 
-geom_highlight_point <- function(expr) {
+geom_highlight_ <- function(expr) {
   structure(list(expr = rlang::enquo(expr)), class = "highlight")
 }
 
@@ -165,8 +175,9 @@ ggplot_add.highlight <- function(object, plot, object_name) {
   new_data <- dplyr::filter(plot$data, !! object$expr)
   new_layer <- geom_point(data = new_data,
                           mapping = plot$mapping,
-                          colour = alpha("red", 0.5),
-                          size = 5)
-  plot$layers <- append(plot$layers, new_layer)
+                          colour = alpha("black", 1),
+                          show.legend = FALSE,
+                          size = 4.5)
+  plot$layers <- append(new_layer, plot$layers)
   plot
 }
