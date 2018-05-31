@@ -17,22 +17,8 @@
 #'
 #' @author
 #' Zoe Meers
-geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, highlightgovernment=FALSE, government= NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("classroom", "opposing_benches")) {
+geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, highlightgovernment=FALSE, government= NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("opposing_benches")) {
     
-   if (type == "classroom") {
-        result <- expand.grid(
-            y = 1:parlrows,
-            x = seq_len(ceiling(sum(seatspp) / parlrows))
-        )
-        
-        vec <- rep(party_names, seatspp)
-        result$party <- c(vec, rep(NA, nrow(result) - length(vec)))
-        
-        # Plot it
-        geom_tile(data = result, aes(x, y, fill=as.character(party)),colour="white", size=0.8)
-        
-    }
-    else {
         result <- expand.grid(
             x = 1:parlrows,
             y = seq_len(ceiling(sum(seatspp) / parlrows))
@@ -43,10 +29,7 @@ geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, highlightgover
         
         # Plot it
         geom_tile(data = result, aes(x, y, fill=as.character(party)),colour="white", size=0.8)
-        
-        
-    }
-    
+      
 }
 
 
