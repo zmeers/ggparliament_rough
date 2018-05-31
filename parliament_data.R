@@ -155,7 +155,7 @@ theme_parliament <- function() {
 #'
 #' @author
 #' Zoe Meers
-geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, size = NULL, party_names=NULL, type=c("opposing_benches")) {
+geom_parliament_waffle<- function(totalseats=NULL, parlrows=NULL, seatspp=NULL, size = NULL, party_names=NULL, type="opposing_benches") {
   
   result <- expand.grid(
     x = 1:parlrows,
